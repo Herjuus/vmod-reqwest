@@ -93,10 +93,10 @@ impl<'a> Serve<BackendResp> for VCLBackend {
         
         let mut req_headers: Vec<(String, String)> = bereq.into_iter().map(|(k, v)| (k.into(), v.into())).collect();
 
-        // Append host to as base_url if use_upstream_host is enabled.
+        // Append host to headers as base_url if use_upstream_host is enabled.
         if self.use_upstream_host.unwrap_or(false) {
             let base_url_host = reqwest::Url::parse(&self.base_url.as_ref().unwrap())?.host_str().unwrap();
-            req_headers.append(("Host".to_string(), base_url_host.to_string()));
+            req_headers.push(("Host".to_string(), base_url_host.to_string()));
         }
 
         let (req_body_tx, body) = hyper::body::Body::channel();
