@@ -67,7 +67,7 @@ impl<'a> Serve<BackendResp> for VCLBackend {
             return Err("unhealthy".into());
         }
 
-        let mut bereq: = ctx.http_bereq.as_ref().unwrap();
+        let mut bereq = ctx.http_bereq.as_ref().unwrap();
 
         let bereq_url = bereq.url().unwrap();
 
@@ -90,11 +90,13 @@ impl<'a> Serve<BackendResp> for VCLBackend {
             // else use bereq.url as-is
             bereq_url.to_string()
         };
+        
+        let mut req_headers = bereq.into_iter().map(|(k, v)| (k.into(), v.into())).collect();
 
-        // Set host to base_url if use_upstream_host is enabled.
+        // Append host to as base_url if use_upstream_host is enabled.
         if self.use_upstream_host.unwrap_or(false) {
             let base_url_host = reqwest::Url::parse(&self.base_url.as_ref().unwrap())?.host_str().unwrap();
-            &bereq.set_header("Host", base_url_host);
+            req_headers.append(("Host".to_string(), base_url_host.to_string()));
         }
 
         let (req_body_tx, body) = hyper::body::Body::channel();
@@ -104,10 +106,7 @@ impl<'a> Serve<BackendResp> for VCLBackend {
             client: self.client.clone(),
             body: ReqBody::Stream(body),
             vcl: false,
-            headers: bereq
-                .into_iter()
-                .map(|(k, v)| (k.into(), v.into()))
-                .collect(),
+            headers: req_headers,
         };
 
         let mut resp_rx = unsafe { (*self.bgt).spawn_req(req) };
