@@ -94,7 +94,7 @@ impl<'a> Serve<BackendResp> for VCLBackend {
         let mut req_headers: Vec<(String, String)> = bereq.into_iter().map(|(k, v)| (k.into(), v.into())).collect();
 
         // Append host to headers as base_url if use_upstream_host is enabled.
-        if Some(self.base_url) {
+        if self.base_url.is_some() {
             if self.use_upstream_host.unwrap_or(false) {
                 let base_url_host = reqwest::Url::parse(&self.base_url)?.host_str().unwrap();
                 req_headers.push(("Host".to_string(), base_url_host.to_string()));
