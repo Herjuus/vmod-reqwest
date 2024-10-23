@@ -96,7 +96,8 @@ impl<'a> Serve<BackendResp> for VCLBackend {
         // Append host to headers as base_url if use_upstream_host is enabled.
         if self.base_url.is_some() {
             if self.use_upstream_host.unwrap_or(false) {
-                let base_url_host = reqwest::Url::parse(&self.base_url.clone().unwrap())?.host_str().unwrap();
+                let base_url = self.base_url.clone().unwrap();
+                let base_url_host = reqwest::Url::parse(&base_url)?.host_str().unwrap();
                 req_headers.push(("Host".to_string(), base_url_host.to_string()));
             }
         }
