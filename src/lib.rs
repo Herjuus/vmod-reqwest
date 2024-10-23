@@ -2,6 +2,7 @@ varnish::boilerplate!();
 
 use anyhow::{anyhow, bail, Context, Error, Result};
 use bytes::Bytes;
+use varnish::vcl::http::HTTP;
 use std::boxed::Box;
 use std::io::Write;
 use std::os::raw::{c_char, c_uint, c_void};
@@ -67,7 +68,7 @@ impl<'a> Serve<BackendResp> for VCLBackend {
             return Err("unhealthy".into());
         }
 
-        let mut bereq = ctx.http_bereq.as_ref().unwrap();
+        let mut bereq: &mut HTTP<'_> = ctx.http_bereq.as_ref();
 
         let bereq_url = bereq.url().unwrap();
 
