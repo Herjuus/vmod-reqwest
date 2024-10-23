@@ -7,7 +7,6 @@ $Event event_function
 $Object client(PRIV_VCL,
 	[STRING base_url],
 	[BOOL https],
-	[BOOL use_upstream_host],
 	INT follow = 10,
 	[DURATION timeout],
 	[DURATION connect_timeout],
@@ -19,6 +18,7 @@ $Object client(PRIV_VCL,
 	[STRING http_proxy],
 	[STRING https_proxy],
 	PROBE probe = 0
+	[BOOL use_upstream_host],
 	)
 
 Create a `client` object that can be used both for backend requests and in-vcl requests and will pool connections across them all. All arguments are optional.
