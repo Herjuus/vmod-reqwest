@@ -93,8 +93,8 @@ impl<'a> Serve<BackendResp> for VCLBackend {
 
         // Set host to base_url if use_upstream_host is enabled.
         if self.use_upstream_host.unwrap_or(false) {
-            let base_url_host = reqwest::Url::parse(&self.base_url.unwrap())?.host_str().unwrap();
-            bereq.set_header("Host", base_url_host);
+            let base_url_host = reqwest::Url::parse(&self.base_url.as_ref().unwrap())?.host_str().unwrap();
+            &bereq.set_header("Host", base_url_host);
         }
 
         let (req_body_tx, body) = hyper::body::Body::channel();
