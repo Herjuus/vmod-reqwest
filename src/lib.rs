@@ -91,7 +91,7 @@ impl<'a> Serve<BackendResp> for VCLBackend {
             bereq_url.to_string()
         };
         
-        let mut req_headers = bereq.into_iter().map(|(k, v)| (k.into(), v.into())).collect();
+        let mut req_headers: Vec<(String, String)> = bereq.into_iter().map(|(k, v)| (k.into(), v.into())).collect();
 
         // Append host to as base_url if use_upstream_host is enabled.
         if self.use_upstream_host.unwrap_or(false) {
