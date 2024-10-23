@@ -54,6 +54,7 @@ struct VCLBackend {
     probe_state: Option<ProbeState>,
     https: bool,
     base_url: Option<String>,
+    use_upstream_host: Option<bool>,
 }
 
 impl<'a> Serve<BackendResp> for VCLBackend {
@@ -89,6 +90,12 @@ impl<'a> Serve<BackendResp> for VCLBackend {
             // else use bereq.url as-is
             bereq_url.to_string()
         };
+
+        // Set host to base_url if use_upstream_host is enabled.
+        if self.use_upstream_host.unwrap_or(false) {
+            let base_url_host = reqwest::Url::parse(&base_url)?.host_str().unwrap();
+            bereq.set_header("Host", base_url_host);
+        }
 
         let (req_body_tx, body) = hyper::body::Body::channel();
         let req = Request {
@@ -414,6 +421,7 @@ impl client {
         http_proxy: Option<&str>,
         https_proxy: Option<&str>,
         probe: Option<Probe>,
+        use_upstream_host: Option<bool>,
     ) -> Result<Self> {
         let mut rcb = reqwest::ClientBuilder::new()
             .brotli(auto_brotli)
@@ -453,6 +461,13 @@ impl client {
             );
         }
 
+        if base_url.is_none() && use_upstream_host.is_some() {
+            bail!(
+                "reqwest: couldn't initialize {}: can't enable use_upstream_host if base_url is not set",
+                vcl_name
+            )
+        }
+
         let probe_state = match probe {
             Some(spec) => Some(build_probe_state(spec, base_url)
                         .with_context(|| format!("reqwest: failed to add probe to {}", vcl_name))?),
@@ -469,6 +484,7 @@ impl client {
                                   probe_state,
                                   https: https.unwrap_or(false),
                                   base_url: base_url.map(|s| s.into()),
+                                  use_upstream_host,
                               },
                               has_probe)?;
         let client = client {
