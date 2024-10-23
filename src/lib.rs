@@ -486,7 +486,7 @@ impl client {
                                   probe_state,
                                   https: https.unwrap_or(false),
                                   base_url: base_url.map(|s| s.into()),
-                                  use_upstream_host,
+                                  use_upstream_host: use_upstream_host.or(Some(false)),
                               },
                               has_probe)?;
         let client = client {
