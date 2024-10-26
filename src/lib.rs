@@ -100,7 +100,7 @@ impl<'a> Serve<BackendResp> for VCLBackend {
                 let base_url_host = base_url.host_str().unwrap();
                 // req_headers.retain(|(h, _)| h.to_lowercase() != "host");
                 // req_headers.push(("Host".to_string(), base_url_host.to_string()));
-                bereq.set_header("Host", base_url_host)
+                bereq.set_header("Host", base_url_host);
             }
         }
 
