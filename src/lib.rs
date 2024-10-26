@@ -67,7 +67,7 @@ impl<'a> Serve<BackendResp> for VCLBackend {
             return Err("unhealthy".into());
         }
 
-        let bereq = ctx.http_bereq.as_ref().unwrap();
+        let bereq = ctx.http_bereq.as_mut().unwrap();
 
         let bereq_url = bereq.url().unwrap();
 
