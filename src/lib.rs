@@ -98,6 +98,7 @@ impl<'a> Serve<BackendResp> for VCLBackend {
             if self.use_upstream_host.unwrap_or(false) {
                 let base_url = reqwest::Url::parse(&self.base_url.clone().unwrap())?;
                 let base_url_host = base_url.host_str().unwrap();
+                req_headers.retain(|(h, _)| h.to_lowercase() != "host");
                 req_headers.push(("Host".to_string(), base_url_host.to_string()));
             }
         }
